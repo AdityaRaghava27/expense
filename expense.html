@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Vault</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <style>
+        :root,
+        [data-theme="light"] {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --surface2: #f5f7fa;
+            --border: #e5e7eb;
+            --divider: #e5e7eb;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --inverse: #f9f8f4;
+            --primary: #1778f2;
+            --primary-soft: #e8f1ff;
+            --success: #437a22;
+            --error: #a12c7b;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .06);
+            --radius: .85rem;
+            --space: .95rem;
+            --font: 'Satoshi', system-ui, sans-serif
+        }
+
+        [data-theme="dark"] {
+            --bg: #171614;
+            --surface: #1c1b19;
+            --surface2: #201f1d;
+            --border: #393836;
+            --divider: #262523;
+            --text: #cdccca;
+            --muted: #9a9894;
+            --inverse: #1c1b19;
+            --primary: #4f98a3;
+            --primary-soft: #313b3b;
+            --success: #6daa45;
+            --error: #d163a7
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            margin: 0;
+            height: 100%
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 16px
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            min-height: 100dvh;
+            max-width: 1280px;
+            margin: 0 auto;
+            background: var(--surface)
+        }
+
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1.1rem;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            overflow: auto
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.25rem
+        }
+
+        .brand svg {
+            width: 36px;
+            height: 36px
+        }
+
+        .brand h1 {
+            font-size: 1.05rem;
+            margin: 0;
+            font-weight: 800
+        }
+
+        .tiny {
+            font-size: .8rem;
+            color: var(--muted)
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            margin-bottom: .45rem;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            padding: .9rem 1rem;
+            border-radius: .8rem;
+            transition: all 160ms ease;
+            font-weight: 700
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--inverse)
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            background: color-mix(in oklab, var(--surface) 96%, white);
+            position: sticky;
+            top: 0;
+            z-index: 5
+        }
+
+        .main {
+            padding: 1.35rem;
+            overflow: auto;
+            max-width: 1040px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr .98fr;
+            gap: 1.1rem
+        }
+
+        .stack {
+            display: grid;
+            gap: 1rem
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            padding: 1rem
+        }
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: .9rem
+        }
+
+        .kpi {
+            padding: 1rem;
+            background: color-mix(in oklab, var(--surface2) 92%, var(--surface));
+            border: 1px solid var(--border);
+            border-radius: .85rem
+        }
+
+        .kpi strong {
+            display: block;
+            font-size: 1.3rem;
+            font-variant-numeric: tabular-nums;
+            margin-top: .15rem;
+            font-weight: 800
+        }
+
+        label {
+            display: grid;
+            gap: .35rem;
+            margin-bottom: .75rem
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: .92rem 1rem;
+            border-radius: .75rem;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical
+        }
+
+        .row {
+            display: flex;
+            gap: .8rem;
+            flex-wrap: wrap
+        }
+
+        .row>* {
+            flex: 1
+        }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            padding: .84rem 1rem;
+            border-radius: .8rem;
+            font-weight: 700
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--inverse)
+        }
+
+        .btn.warn {
+            background: var(--error);
+            border-color: var(--error);
+            color: #fff
+        }
+
+        .btn.ghost {
+            background: transparent
+        }
+
+        .list {
+            display: grid;
+            gap: .8rem
+        }
+
+        .item,
+        .review-card {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: .9rem;
+            background: var(--surface2)
+        }
+
+        .item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: .75rem
+        }
+
+        .review-card.accept {
+            border-color: color-mix(in oklab, var(--success) 35%, var(--border))
+        }
+
+        .review-card.ignore {
+            border-color: color-mix(in oklab, var(--muted) 25%, var(--border))
+        }
+
+        .review-card.reviewing {
+            border-color: color-mix(in oklab, var(--primary) 35%, var(--border))
+        }
+
+        .amount {
+            font-weight: 800;
+            font-variant-numeric: tabular-nums
+        }
+
+        .privacy-hide .amount {
+            filter: blur(8px);
+            user-select: none
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: .3rem .7rem;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: .75rem;
+            font-weight: 700
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: .8rem 1rem;
+            border-radius: .7rem
+        }
+
+        .ok {
+            background: color-mix(in oklab, var(--success) 12%, var(--surface));
+            color: var(--success)
+        }
+
+        .err {
+            background: color-mix(in oklab, var(--error) 12%, var(--surface));
+            color: var(--error)
+        }
+
+        .lock-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 9, 9, .55);
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 50
+        }
+
+        .lock-card {
+            width: min(620px, 100%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.35rem;
+            box-shadow: var(--shadow)
+        }
+
+        @media (max-width:980px) {
+            .app {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border)
+            }
+
+            .grid,
+            .kpis {
+                grid-template-columns: 1fr
+            }
+
+            .header {
+                position: relative
+            }
+
+            .main {
+                padding: 1rem
+            }
+        }
+
+        @media (max-width:760px) {
+            .app {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border)
+            }
+
+            .main {
+                max-width: none;
+                padding: 1rem
+            }
+
+            .lock-card {
+                width: 100%;
+                padding: 1rem
+            }
+
+            .row {
+                flex-direction: column
+            }
+
+            .item {
+                grid-template-columns: 1fr
+            }
+
+            .kpis {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .header {
+                padding: .9rem 1rem
+            }
+
+            .sidebar {
+                padding: .95rem
+            }
+        }
+
+        @media (max-width:520px) {
+
+            .header,
+            .main,
+            .sidebar {
+                padding: .9rem
+            }
+
+            .lock-card {
+                padding: 1rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-card">
+            <h2 style="margin-top:0">Expense Vault</h2>
+            <p class="tiny" style="font-size:.9rem;line-height:1.6;margin-top:.35rem;color:var(--muted)">Encrypted local
+                storage, manual add, message review, date filters, and no Gmail or phone-number sign-in.</p>
+            <div class="panel" style="margin-top:1rem;background:var(--surface2)">
+                <div class="tiny">How to use</div>
+                <ol style="margin:.5rem 0 0;padding-left:1rem">
+                    <li class="tiny">Set a PIN.</li>
+                    <li class="tiny">Add expenses manually or import SMS text.</li>
+                    <li class="tiny">Review parsed messages, then save.</li>
+                    <li class="tiny">Open History for date filters.</li>
+                </ol>
+            </div>
+            <div id="authMessage"></div>
+            <div id="setupFlow" class="hidden">
+                <label>Set 4-8 digit PIN<input id="newPin" inputmode="numeric" maxlength="8"
+                        placeholder="Create PIN"></label>
+                <label>Confirm PIN<input id="confirmPin" inputmode="numeric" maxlength="8"
+                        placeholder="Confirm PIN"></label>
+                <button class="btn primary" id="setupBtn" type="button">Create private vault</button>
+            </div>
+            <div id="unlockFlow" class="hidden">
+                <label>Enter PIN<input id="unlockPin" inputmode="numeric" maxlength="8" placeholder="Enter PIN"></label>
+                <div class="row actions"><button class="btn primary" id="unlockBtn" type="button">Unlock</button><button
+                        class="btn ghost" id="wipeBtn" type="button">Reset local data</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app hidden" id="appShell">
+        <aside class="sidebar">
+            <div class="brand">
+                <svg viewBox="0 0 48 48" fill="none">
+                    <rect x="6" y="8" width="36" height="32" rx="10" stroke="currentColor" stroke-width="3" />
+                    <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="3" />
+                    <path d="M24 18v12M18 24h12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                <div>
+                    <h1>Expense Vault</h1>
+                    <div class="tiny">Private daily spending</div>
+                </div>
+            </div>
+            <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+            <button class="nav-btn" data-view="add">Add expense</button>
+            <button class="nav-btn" data-view="messages">Import messages</button>
+            <button class="nav-btn" data-view="history">History</button>
+            <button class="nav-btn" data-view="privacy">Privacy</button>
+            <div class="panel" style="margin-top:1rem">
+                <div class="tiny">Privacy model</div>
+                <ul style="padding-left:1rem;margin:.5rem 0 0">
+                    <li class="tiny">No sign-in needed</li>
+                    <li class="tiny">Encrypted local storage</li>
+                    <li class="tiny">Message review before save</li>
+                    <li class="tiny">Calendar date filters</li>
+                </ul>
+            </div>
+        </aside>
+
+        <header class="header">
+            <div>
+                <div class="tiny">Today</div><strong id="todayLabel">-</strong>
+            </div>
+            <div class="row actions" style="justify-content:flex-end;max-width:580px;flex:1"><button class="btn ghost"
+                    id="privacyToggleBtn" type="button">Hide amounts</button><button class="btn ghost" id="themeBtn"
+                    type="button">Theme</button><button class="btn ghost" id="lockBtn" type="button">Lock</button></div>
+        </header>
+
+        <main class="main" id="mainRoot">
+            <section class="view" id="view-dashboard">
+                <div style="margin-bottom: 1rem; max-width: 250px;">
+                    <label>Filter Dashboard by Date<input id="dashboardDate" type="date"></label>
+                </div>
+                <div class="kpis">
+                    <div class="kpi">
+                        <div class="tiny">Selected Day spent</div><strong class="amount" id="kpiToday">₹0</strong>
+                    </div>
+                    <div class="kpi">
+                        <div class="tiny">This month</div><strong class="amount" id="kpiMonth">₹0</strong>
+                    </div>
+                    <div class="kpi">
+                        <div class="tiny">Entries</div><strong id="kpiCount">0</strong>
+                    </div>
+                    <div class="kpi">
+                        <div class="tiny">Imported SMS</div><strong id="kpiImported">0</strong>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="panel">
+                        <h3 style="margin-top:0">Daily spending</h3>
+                        <div class="tiny">Last 7 days</div>
+                        <div id="barChart" class="bars"></div>
+                    </div>
+                    <div class="stack">
+                        <div class="panel">
+                            <h3 style="margin-top:0">Recent expenses</h3>
+                            <div id="recentList" class="list"></div>
+                        </div>
+                        <div class="panel">
+                            <h3 style="margin-top:0">Vault status</h3>
+                            <p id="securitySummary">Encrypted vault is active on this device.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="view hidden" id="view-add">
+                <div class="panel">
+                    <h3 style="margin-top:0">Quick add expense</h3>
+                    <p class="tiny">Select a date for the expense.</p>
+                    <form id="manualForm">
+                        <div class="row"><label>Date<input id="expenseDate" type="date" required></label></div>
+                        <div class="row"><label>Amount (₹)<input id="expenseAmount" type="number" min="0.01" step="0.01"
+                                    required placeholder="250"></label><label>Category<select id="expenseCategory">
+                                    <option>Food</option>
+                                    <option>Travel</option>
+                                    <option>Bills</option>
+                                    <option>Shopping</option>
+                                    <option>Health</option>
+                                    <option>Transfer</option>
+                                    <option>Other</option>
+                                </select></label></div><label>Merchant / note<input id="expenseMerchant"
+                                placeholder="Zomato, Metro, Electricity"></label><button class="btn primary"
+                            type="submit">Save expense</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="view hidden" id="view-messages">
+                <div class="grid">
+                    <div class="panel">
+                        <h3 style="margin-top:0">Import transaction messages</h3>
+                        <p class="tiny">Paste one message per line. The app checks each line locally.</p>
+                        <label>Messages<textarea id="smsInput"
+                                placeholder="Dear UPI user A/C X1234 debited by 1100.00 on date 04May26 trf to Airtel Payments Refno 12345678901234 If not u? call-1234567890 for other services-1234567890-SBI&#10;Dear UPI user A/C X1234 debited by 400.00 on date 03May26 trf to Airtel Payments Refno 12345678901234 If not u? call-12345678 for other services-12345678-SBI"></textarea></label>
+                        <div class="row actions"><button class="btn primary" id="parseBtn" type="button">Review
+                                messages</button><button class="btn ghost" id="saveBtn" type="button">Save
+                                accepted</button></div>
+                        <div id="smsResult"></div>
+                        <div id="reviewList" class="list" style="margin-top:1rem"></div>
+                    </div>
+                    <div class="panel">
+                        <h3 style="margin-top:0">Parser notes</h3>
+                        <ul style="padding-left:1rem;margin:0">
+                            <li class="tiny">Debit-like messages can become expenses.</li>
+                            <li class="tiny">Credits, refunds, reversals, failed, and pending alerts are ignored.</li>
+                            <li class="tiny">Unclear messages remain in review until you choose.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="view hidden" id="view-history">
+                <div class="panel">
+                    <h3 style="margin-top:0">History</h3>
+                    <div class="row"><label>From date<input id="fromDate" type="date"></label><label>To date<input
+                                id="toDate" type="date"></label><label>Quick filter<select id="quickFilter">
+                                <option value="custom">Custom</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select></label></div>
+                    <div class="row actions"><button class="btn primary" id="applyFilterBtn" type="button">Apply
+                            filter</button><button class="btn ghost" id="clearFilterBtn" type="button">Clear</button>
+                    </div>
+                    <div class="kpis" style="margin-top:1rem;grid-template-columns:repeat(3,1fr)">
+                        <div class="kpi">
+                            <div class="tiny">Selected total</div><strong class="amount" id="historyTotal">₹0</strong>
+                        </div>
+                        <div class="kpi">
+                            <div class="tiny">Selected entries</div><strong id="historyCount">0</strong>
+                        </div>
+                        <div class="kpi">
+                            <div class="tiny">Range</div><strong id="historyRange">All</strong>
+                        </div>
+                    </div>
+                    <div id="historyList" class="list" style="margin-top:1rem"></div>
+                </div>
+            </section>
+
+            <section class="view hidden" id="view-privacy">
+                <div class="grid">
+                    <div class="panel">
+                        <h3 style="margin-top:0">Privacy controls</h3>
+                        <div id="securityMsg"></div>
+                        <div class="row actions"><button class="btn ghost" id="exportBtn" type="button">Export encrypted
+                                backup</button><button class="btn ghost" id="importBtn" type="button">Import encrypted
+                                backup</button></div><input id="importFile" type="file" accept="application/json"
+                            class="hidden">
+                        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0"><label>Change PIN<input
+                                id="changePin" inputmode="numeric" maxlength="8" placeholder="New PIN"></label><button
+                            class="btn primary" id="changePinBtn" type="button">Update PIN</button>
+                        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0"><button
+                            class="btn warn" id="deleteBtn" type="button">Delete all local data</button>
+                    </div>
+                    <div class="panel">
+                        <h3 style="margin-top:0">Stored data</h3>
+                        <table style="width:100%">
+                            <tr>
+                                <td class="tiny">Accounts required</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td class="tiny">Cloud sync</td>
+                                <td>Disabled</td>
+                            </tr>
+                            <tr>
+                                <td class="tiny">Encryption</td>
+                                <td>AES-GCM</td>
+                            </tr>
+                            <tr>
+                                <td class="tiny">Current mode</td>
+                                <td id="lockModeText">Unlocked</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const app = { pinHash: null, salt: null, verifyCipher: null, dataCipher: null, key: null, items: [], pending: [], unlocked: false, hideAmounts: false };
+        const storageKey = 'expense-vault-v4';
+        const $ = id => document.getElementById(id); const $$ = sel => Array.from(document.querySelectorAll(sel));
+        const enc = new TextEncoder(), dec = new TextDecoder();
+        const todayISO = () => new Date().toISOString().slice(0, 10); const nowISO = () => new Date().toISOString();
+        const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(Number(n || 0));
+        function showMsg(el, text, type = 'ok') { if (el) el.innerHTML = `<div class="message ${type === 'ok' ? 'ok' : 'err'}">${text}</div>`; }
+        function setTheme() { $('themeBtn').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light' : 'Dark'; }
+        (function initTheme() { const dark = matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light'); setTheme(); })();
+        $('themeBtn').addEventListener('click', () => { const root = document.documentElement; root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); setTheme(); });
+        async function sha256(text) { const hash = await crypto.subtle.digest('SHA-256', enc.encode(text)); return btoa(String.fromCharCode(...new Uint8Array(hash))) }
+        function toB64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))) } function fromB64(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)) }
+        async function deriveKey(pin, saltB64) { const base = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: fromB64(saltB64), iterations: 150000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']) }
+        async function encryptJSON(obj, key) { const iv = crypto.getRandomValues(new Uint8Array(12)); const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj))); return { iv: toB64(iv), data: toB64(cipher) } }
+        async function decryptJSON(cipher, key) { const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(cipher.iv) }, key, fromB64(cipher.data)); return JSON.parse(dec.decode(plain)) }
+        function saveVault() { localStorage.setItem(storageKey, JSON.stringify({ pinHash: app.pinHash, salt: app.salt, verifyCipher: app.verifyCipher, dataCipher: app.dataCipher })) }
+        function loadVault() { const raw = localStorage.getItem(storageKey); if (!raw) return false; try { Object.assign(app, JSON.parse(raw)); return true; } catch { return false; } }
+        async function setupVault(pin, preserve = []) { const salt = crypto.getRandomValues(new Uint8Array(16)); app.salt = toB64(salt); app.key = await deriveKey(pin, app.salt); app.pinHash = await sha256(pin); app.verifyCipher = await encryptJSON({ ok: true }, app.key); app.items = preserve; app.dataCipher = await encryptJSON(app.items, app.key); app.unlocked = true; saveVault(); }
+        async function unlockVault(pin) { if (await sha256(pin) !== app.pinHash) throw new Error('Wrong PIN.'); app.key = await deriveKey(pin, app.salt); await decryptJSON(app.verifyCipher, app.key); app.items = await decryptJSON(app.dataCipher, app.key); app.unlocked = true; }
+        async function persist() { app.dataCipher = await encryptJSON(app.items, app.key); saveVault(); }
+        function renderAuth() { const has = !!app.pinHash; $('setupFlow').classList.toggle('hidden', has); $('unlockFlow').classList.toggle('hidden', !has); }
+        function openApp() { $('lockScreen').classList.add('hidden'); $('appShell').classList.remove('hidden'); renderAll(); }
+        function lockApp() { app.unlocked = false; app.key = null; app.items = []; $('appShell').classList.add('hidden'); $('lockScreen').classList.remove('hidden'); $('unlockPin').value = ''; renderAuth(); }
+        function inferCategory(text = '') { const t = text.toLowerCase(); if (/zomato|swiggy|restaurant|cafe|food/.test(t)) return 'Food'; if (/uber|ola|metro|fuel|petrol|travel/.test(t)) return 'Travel'; if (/electricity|water|gas|recharge|broadband|bill/.test(t)) return 'Bills'; if (/amazon|flipkart|myntra|shopping|store/.test(t)) return 'Shopping'; if (/pharma|clinic|hospital|med/.test(t)) return 'Health'; if (/upi|imps|neft|transfer/.test(t)) return 'Transfer'; return 'Other'; }
+        function parseDMY(str) { const m = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/); if (!m) return null; let [, dd, mm, yy] = m; yy = yy.length === 2 ? `20${yy}` : yy; const d = new Date(`${yy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}T00:00:00`); return isNaN(d) ? null : d.toISOString().slice(0, 10) }
+        function amountFrom(text) { const pats = [/(?:inr|rs\.?|₹)\s*([0-9,]+(?:\.\d{1,2})?)/i, /([0-9,]+(?:\.\d{1,2})?)\s*(?:inr)/i, /amount\s*[:\-]?\s*([0-9,]+(?:\.\d{1,2})?)/i, /amt\s*[:\-]?\s*([0-9,]+(?:\.\d{1,2})?)/i, /debited\s+by\s+([0-9,]+(?:\.\d{1,2})?)/i, /txn\s+of\s+rs\s*([0-9,]+(?:\.\d{1,2})?)/i]; for (const p of pats) { const m = text.match(p); if (m) return Number(m[1].replace(/,/g, '')); } return null; }
+        function parseDateFlexible(text) { const iso = text.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/); if (iso) return parseDMY(iso[1]); const m = text.match(/(\d{1,2})([A-Za-z]{3})(\d{2,4})/); if (!m) return null; const map = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' }; const mm = map[m[2].toLowerCase()]; if (!mm) return null; const yy = m[3].length === 2 ? `20${m[3]}` : m[3]; return `${yy}-${mm}-${String(m[1]).padStart(2, '0')}`; }
+        function classify(text) { const t = text.toLowerCase(); if (/credited|received|salary|cashback|refund credited/.test(t)) return ['ignore', 'Credit / income']; if (/refund|refunded|reversed|reversal|failed|declined|pending|unsuccessful|chargeback/.test(t)) return ['ignore', 'Refund, reversal, failed, or pending']; if (/debited|spent|purchase|purchased|paid|sent|withdrawn|txn of|upi txn|payment of|transferred|debited by|trf to/.test(t)) return ['accept', 'Expense detected']; if (/account|a\/c|upi|bank|card|transaction|txn/.test(t)) return ['reviewing', 'Needs review']; return ['skip', 'Not transaction-like']; }
+        function merchantFrom(text) { const cleaned = text.replace(/if not u\?.*$/i, '').replace(/call[-\s]*[0-9\s-]+/ig, '').replace(/ref\s*no\.?\s*[0-9\s]+/ig, '').replace(/\s+/g, ' '); const pats = [/(?:at|to|towards|merchant|vpa|trf to)\s+([A-Za-z0-9*._\-@ &]{2,50})/i, /from\s+([A-Za-z0-9*._\-@ &]{2,50})/i]; for (const p of pats) { const m = cleaned.match(p); if (m) return m[1].trim().replace(/[.]+$/, ''); } return cleaned.slice(0, 42); }
+        function parseLine(line) { const text = line.trim(); if (!text) return null; const [status, reason] = classify(text); if (status === 'skip') return null; const amount = amountFrom(text); const date = parseDateFlexible(text) || todayISO(); return { id: crypto.randomUUID(), date, createdAt: nowISO(), amount: Number(amount || 0), merchant: merchantFrom(text), category: inferCategory(text), source: 'sms', note: text, status: amount == null ? 'reviewing' : status, reason: amount == null ? 'Amount not detected' : reason }; }
+        function view(name) { $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === name)); $$('.view').forEach(v => v.classList.add('hidden')); const el = $('view-' + name); if (el) el.classList.remove('hidden'); }
+        $$('.nav-btn').forEach(btn => btn.addEventListener('click', () => view(btn.dataset.view)));
+        function renderBars() { const days = []; for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(d.toISOString().slice(0, 10)); } const totals = days.map(day => app.items.filter(x => x.date === day).reduce((s, x) => s + x.amount, 0)); const max = Math.max(...totals, 1); $('barChart').innerHTML = days.map((d, i) => `<div class="bar-row"><div class="tiny">${new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div><div class="bar"><span style="width:${(totals[i] / max) * 100}%"></span></div><div class="amount">${money(totals[i])}</div></div>`).join(''); }
+        function renderRecent() { const items = app.items.slice(0, 6); $('recentList').innerHTML = items.length ? items.map(x => `<div class="item"><div><strong>${x.merchant}</strong><div class="tiny">${x.date} · ${x.category} · ${x.source}</div></div><div class="amount">${money(x.amount)}</div></div>`).join('') : '<div class="tiny">No expenses yet.</div>'; }
+        function filteredItems() { const from = $('fromDate').value, to = $('toDate').value; return app.items.filter(x => (!from || x.date >= from) && (!to || x.date <= to)); }
+        function renderHistory() { const items = filteredItems(); const total = items.reduce((s, x) => s + x.amount, 0); $('historyTotal').textContent = money(total); $('historyCount').textContent = items.length; $('historyRange').textContent = $('fromDate').value || $('toDate').value ? `${$('fromDate').value || '...'} → ${$('toDate').value || '...'}` : 'All'; $('historyList').innerHTML = items.length ? items.map(x => `<div class="item"><div><strong>${x.merchant}</strong><div class="tiny">${x.date} · ${x.category} · ${x.source}</div></div><div class="amount">${money(x.amount)}</div></div>`).join('') : '<div class="tiny">No expenses found for this filter.</div>'; }
+        function renderReview() { const items = app.pending; $('reviewList').innerHTML = items.length ? items.map((x, i) => `<div class="review ${x.status}"><div><strong>${x.merchant}</strong><div class="tiny">${x.reason} · ${x.date} · ${x.category}</div><div class="tiny" style="margin-top:.25rem">${x.note}</div></div><div class="row actions" style="margin-top:.6rem"><div class="amount">${x.amount ? money(x.amount) : '—'}</div><select data-i="${i}"><option value="accept" ${x.status === 'accept' ? 'selected' : ''}>Save expense</option><option value="ignore" ${x.status === 'ignore' ? 'selected' : ''}>Ignore</option><option value="reviewing" ${x.status === 'reviewing' ? 'selected' : ''}>Needs review</option></select></div></div>`).join('') : '<div class="tiny">No parsed messages yet.</div>'; $$('#reviewList select').forEach(sel => sel.addEventListener('change', e => { app.pending[Number(e.target.dataset.i)].status = e.target.value; renderReview(); renderPrivacy(); })); }
+        function renderPrivacy() { $('mainRoot').classList.toggle('privacy-hide', app.hideAmounts); $('privacyToggleBtn').textContent = app.hideAmounts ? 'Show amounts' : 'Hide amounts'; }
+        function renderKPIs() { const selectedDate = $('dashboardDate') && $('dashboardDate').value ? $('dashboardDate').value : todayISO(); const t = selectedDate, m = t.slice(0, 7); const dObj = new Date(selectedDate + 'T00:00:00'); $('todayLabel').textContent = isNaN(dObj) ? '-' : dObj.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }); $('kpiToday').textContent = money(app.items.filter(x => x.date === t).reduce((s, x) => s + x.amount, 0)); $('kpiMonth').textContent = money(app.items.filter(x => x.date.startsWith(m)).reduce((s, x) => s + x.amount, 0)); $('kpiCount').textContent = app.items.length; $('kpiImported').textContent = app.items.filter(x => x.source === 'sms').length; $('securitySummary').textContent = 'Encrypted vault is active on this device. No sign-in is required.'; $('lockModeText').textContent = app.unlocked ? 'Unlocked' : 'Locked'; }
+        function renderAll() { renderKPIs(); renderBars(); renderRecent(); renderHistory(); renderReview(); renderPrivacy(); }
+        $('manualForm').addEventListener('submit', async e => { e.preventDefault(); app.items.unshift({ id: crypto.randomUUID(), date: $('expenseDate').value || todayISO(), createdAt: nowISO(), amount: Number($('expenseAmount').value), category: $('expenseCategory').value, merchant: $('expenseMerchant').value.trim() || 'Manual entry', source: 'manual', note: '' }); await persist(); e.target.reset(); if($('expenseDate')) $('expenseDate').value = todayISO(); renderAll(); view('dashboard'); });
+        $('parseBtn').addEventListener('click', () => { app.pending = $('smsInput').value.split(/\n+/).map(parseLine).filter(Boolean); if (!app.pending.length) return showMsg($('smsResult'), 'No transaction-like messages detected. Paste one message per line.', 'err'); const a = app.pending.filter(x => x.status === 'accept').length, i = app.pending.filter(x => x.status === 'ignore').length, r = app.pending.filter(x => x.status === 'reviewing').length; showMsg($('smsResult'), `${app.pending.length} lines checked: ${a} expense, ${i} ignored, ${r} need review.`); renderReview(); view('messages'); });
+        $('saveBtn').addEventListener('click', async () => { const accepted = app.pending.filter(x => x.status === 'accept').map(({ status, reason, ...rest }) => rest); if (!accepted.length) return showMsg($('smsResult'), 'No accepted expense lines to save.', 'err'); app.items = [...accepted, ...app.items]; app.pending = []; $('smsInput').value = ''; await persist(); showMsg($('smsResult'), `${accepted.length} expense message${accepted.length > 1 ? 's' : ''} saved to local history.`); renderAll(); view('dashboard'); });
+        $('applyFilterBtn').addEventListener('click', () => { renderHistory(); view('history'); });
+        $('clearFilterBtn').addEventListener('click', () => { $('fromDate').value = ''; $('toDate').value = ''; $('quickFilter').value = 'custom'; renderHistory(); });
+        $('quickFilter').addEventListener('change', e => { const now = new Date(), pad = n => String(n).padStart(2, '0'), fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; let from = '', to = ''; if (e.target.value === 'today') { from = to = todayISO() } else if (e.target.value === 'week') { const d = new Date(); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day); from = fmt(d); to = todayISO() } else if (e.target.value === 'month') { from = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-01`; to = todayISO() } else if (e.target.value === 'year') { from = `${now.getFullYear()}-01-01`; to = todayISO() } $('fromDate').value = from; $('toDate').value = to; renderHistory(); });
+        $('privacyToggleBtn').addEventListener('click', () => { app.hideAmounts = !app.hideAmounts; renderPrivacy(); }); $('lockBtn').addEventListener('click', lockApp);
+        if($('dashboardDate')) { $('dashboardDate').value = todayISO(); $('dashboardDate').addEventListener('change', renderKPIs); }
+        if($('expenseDate')) { $('expenseDate').value = todayISO(); }
+        $('setupBtn').addEventListener('click', async () => { const p = $('newPin').value.trim(), c = $('confirmPin').value.trim(); if (!/^\d{4,8}$/.test(p)) return showMsg($('authMessage'), 'Use a 4 to 8 digit PIN.', 'err'); if (p !== c) return showMsg($('authMessage'), 'PINs do not match.', 'err'); await setupVault(p); openApp(); });
+        $('unlockBtn').addEventListener('click', async () => { try { await unlockVault($('unlockPin').value.trim()); openApp(); } catch (e) { showMsg($('authMessage'), e.message, 'err'); } }); $('wipeBtn').addEventListener('click', () => { if (confirm('Delete the encrypted vault from this browser?')) { localStorage.removeItem(storageKey); location.reload(); } });
+        $('changePinBtn').addEventListener('click', async () => { const p = $('changePin').value.trim(); if (!/^\d{4,8}$/.test(p)) return showMsg($('securityMsg'), 'Use a 4 to 8 digit PIN.', 'err'); const items = [...app.items]; await setupVault(p, items); $('changePin').value = ''; showMsg($('securityMsg'), 'PIN updated and vault re-encrypted.'); renderAll(); });
+        $('deleteBtn').addEventListener('click', async () => { if (confirm('Delete all local expense history?')) { app.items = []; await persist(); showMsg($('securityMsg'), 'All local data deleted.'); renderAll(); } });
+        $('exportBtn').addEventListener('click', () => { const raw = localStorage.getItem(storageKey); if (!raw) return showMsg($('securityMsg'), 'No vault data to export.', 'err'); const blob = new Blob([raw], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'expense-vault-backup.json'; a.click(); URL.revokeObjectURL(a.href); showMsg($('securityMsg'), 'Encrypted backup exported.'); });
+        $('importBtn').addEventListener('click', () => $('importFile').click()); $('importFile').addEventListener('change', async e => { const file = e.target.files[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (!data.pinHash || !data.salt || !data.verifyCipher || !data.dataCipher) throw new Error('Invalid'); localStorage.setItem(storageKey, JSON.stringify(data)); showMsg($('securityMsg'), 'Encrypted backup imported. Unlock with its PIN.'); setTimeout(() => location.reload(), 500); } catch { showMsg($('securityMsg'), 'Backup import failed.', 'err'); } });
+        loadVault(); renderAuth(); if (!app.pinHash) { $('setupFlow').classList.remove('hidden'); } else { $('unlockFlow').classList.remove('hidden'); }
+    </script>
+</body>
+
+</html>
+
+<style>
+    @media (max-width: 520px) {
+        .lock-card {
+            width: 100%;
+            padding: 1rem
+        }
+
+        .sidebar {
+            padding: .9rem
+        }
+
+        .main {
+            padding: .9rem
+        }
+
+        .header {
+            padding: .9rem 1rem
+        }
+    }
+</style>
